@@ -27,7 +27,7 @@ if [ "${POSTGRES_PASSWORD}" = "**None**" -a "${POSTGRES_PASSWORD_FILE}" = "**Non
   exit 1
 fi
 
-#Process vars
+# Process vars
 if [ "${POSTGRES_DB_FILE}" = "**None**" ]; then
   POSTGRES_DBS=$(echo "${POSTGRES_DB}" | tr , " ")
 elif [ -r "${POSTGRES_DB_FILE}" ]; then
@@ -57,22 +57,39 @@ KEEP_DAYS=${BACKUP_KEEP_DAYS}
 KEEP_WEEKS=`expr $(((${BACKUP_KEEP_WEEKS} * 7) + 1))`
 KEEP_MONTHS=`expr $(((${BACKUP_KEEP_MONTHS} * 31) + 1))`
 
-#Initialize dirs
+# Initialize dirs
 mkdir -p "${BACKUP_DIR}/daily/" "${BACKUP_DIR}/weekly/" "${BACKUP_DIR}/monthly/"
 
-#Loop all databases
+# Loop all databases
 for DB in ${POSTGRES_DBS}; do
-  #Initialize filename vers
+  # Initialize filename vars
   DFILE="${BACKUP_DIR}/daily/${DB}-`date +%Y%m%d-%H%M%S`.sql.gz"
   WFILE="${BACKUP_DIR}/weekly/${DB}-`date +%G%V`.sql.gz"
   MFILE="${BACKUP_DIR}/monthly/${DB}-`date +%Y%m`.sql.gz"
-  #Create dump
+  # Create dump
   echo "Creating dump of ${DB} database from ${POSTGRES_HOST}..."
   pg_dump -f "${DFILE}" ${POSTGRES_HOST_OPTS} ${DB}
-  #Copy (hardlink) for each entry
+  # Copy (hardlink) for each entry
   ln -vf "${DFILE}" "${WFILE}"
   ln -vf "${DFILE}" "${MFILE}"
-  #Clean old files
+  if [ "${MAIL_BACKUP}" = "TRUE" ]; then
+    if ["${MAIL_FROM}" == "**None**" ] \
+       || ["${MAIL_TO}" == "**None**" ] \
+       || ["${MAIL_SUBJECT}" == "**None**" ] \
+       || ["${SMTP_SERVER}" == "**None**" ] \
+       || ["${SMTP_PORT}" == "**None**" ] \
+       || ["${MAIL_USER}" == "**None**" ] \
+       || ["${MAIL_PASSWORD}" == "**None**" ]; then
+      echo "Mail Environmental variables are not properly setup."
+    else
+      MAIL_BODY="Postgres Backup Successfully Performed"
+      sendemail -f "${MAIL_FROM}" -t "${MAIL_TO}" -m "${MAIL_BODY}" -u "${MAIL_SUBJECT}" -s "${SMTP_SERVER}:${SMTP_PORT}" -xu "${MAIL_USER}" -xp "${MAIL_PASSWORD}" -a "${DFILE}"
+    fi
+  else
+    echo "Mail Backup not enabled...Moving on"
+  fi
+
+  # Clean old files
   echo "Cleaning older than ${KEEP_DAYS} days for ${DB} database from ${POSTGRES_HOST}..."
   find "${BACKUP_DIR}/daily" -maxdepth 1 -mtime +${KEEP_DAYS} -name "${DB}-*.sql*" -exec rm -rf '{}' ';'
   find "${BACKUP_DIR}/weekly" -maxdepth 1 -mtime +${KEEP_WEEKS} -name "${DB}-*.sql*" -exec rm -rf '{}' ';'
