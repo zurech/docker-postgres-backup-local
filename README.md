@@ -1,17 +1,17 @@
-![Docker Pulls](https://img.shields.io/docker/pulls/prodrigestivill/postgres-backup-local)
+![Docker Pulls](https://img.shields.io/docker/pulls/zurech/docker-postgres-backup-local)
 
 # postgres-backup-local
 
 Backup PostgresSQL to the local filesystem with periodic rotating backups, based on [schickling/postgres-backup-s3](https://hub.docker.com/r/schickling/postgres-backup-s3/).
 Backup multiple databases from the same host by setting the database names in `POSTGRES_DB` separated by commas or spaces.
 
-Supports the following Docker architectures: `linux/amd64`, `linux/arm64`, `linux/arm/v7`.
+Supports the following Docker architectures: `linux/amd64`.
 
 ## Usage
 
 Docker:
 ```sh
-$ docker run -e POSTGRES_HOST=postgres -e POSTGRES_DB=dbname -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password  prodrigestivill/postgres-backup-local
+$ docker run -e POSTGRES_HOST=postgres -e POSTGRES_DB=dbname -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e MAIL_BACKUP=TRUE -e SMTP_SERVER=smtp.example.com -e SMTP_PORT=587 -e MAIL_USER=user@example.com -e MAIL_PASSWORD=xxxxxxxx -e MAIL_FROM=test@example.com -e MAIL_FROM=test@example.com -e MAIL_TO=receiver@otherdomain.com -e MAIL_SUBJECT="Postgres DB Backup" zurech/docker-postgres-backup-local
 ```
 
 Docker Compose:
@@ -27,7 +27,7 @@ services:
             - POSTGRES_PASSWORD=password
          #  - POSTGRES_PASSWORD_FILE=/run/secrets/db_password <-- alternative for POSTGRES_PASSWORD (to use with docker secrets)
     pgbackups:
-        image: prodrigestivill/postgres-backup-local
+        image: zurech/docker-postgres-backup-local
         restart: always
         volumes:
             - /var/opt/pgbackups:/backups
@@ -47,6 +47,14 @@ services:
             - BACKUP_KEEP_WEEKS=4
             - BACKUP_KEEP_MONTHS=6
             - HEALTHCHECK_PORT=80
+            - MAIL_BACKUP=TRUE
+            - SMTP_SERVER=smtp.example.com
+            - SMTP_PORT=587
+            - MAIL_USER=user@example.com
+            - MAIL_PASSWORD=xxxxxxxx
+            - MAIL_FROM=test@example.com
+            - MAIL_TO=receiver@otherdomain.com
+            - MAIL_SUBJECT="Postgres DB Backup"  
 
 ```
 
@@ -69,6 +77,14 @@ Most variables are the same as in the [official postgres image](https://hub.dock
 | POSTGRES_PORT | Postgres connection parameter; postgres port to connect to. Defaults to `5432`. |
 | POSTGRES_USER | Postgres connection parameter; postgres user to connect with. Required. |
 | POSTGRES_USER_FILE | Alternative to POSTGRES_USER, for usage with docker secrets. |
+| MAIL_BACKUP | Enable or Disable send backup file to an email account. By default email backup is disabled. Allowed values: **TRUE** or **FALSE** |
+| SMTP_SERVER | IP Address or DNS name of the SMTP Server that is going to be used to send the emails. |
+| SMTP_PORT | Port of the SMTP Server. |
+| MAIL_USER | User account or username to login to the SMTP Server. |
+| MAIL_PASSWORD | Password to login to the SMTP Server. |
+| MAIL_FROM | Mail address from which the email will be sent. |
+| MAIL_TO | Mail address to which the email will be sent. |
+| MAIL_SUBJECT | Subject of the email. |
 | SCHEDULE | [Cron-schedule](http://godoc.org/github.com/robfig/cron#hdr-Predefined_schedules) specifying the interval between postgres backups. Defaults to `@daily`. |
 
 #### Special Environment Variables
@@ -83,9 +99,18 @@ This variables are not intended to be used for normal deployment operations:
 
 By default this container makes daily backups, but you can start a manual backup by running `/backup.sh`:
 
-```sh
-$ docker run -e POSTGRES_HOST=postgres -e POSTGRES_DB=dbname -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password  prodrigestivill/postgres-backup-local /backup.sh
-```
+* Email Sending Enabled
+
+    ```sh
+    $ docker run -e POSTGRES_HOST=postgres -e POSTGRES_DB=dbname -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e MAIL_BACKUP=TRUE -e SMTP_SERVER=smtp.example.com -e SMTP_PORT=587 -e MAIL_USER=user@example.com -e MAIL_PASSWORD=xxxxxxxx -e MAIL_FROM=test@example.com -e MAIL_FROM=test@example.com -e MAIL_TO=receiver@otherdomain.com -e MAIL_SUBJECT="Postgres DB Backup" zurech/docker-postgres-backup-local /backup.sh
+    ```
+
+* Email Sending Disabled
+
+    ```sh
+    $ docker run -e POSTGRES_HOST=postgres -e POSTGRES_DB=dbname -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password  zurech/docker-postgres-backup-local /backup.sh
+    ```
+
 
 ### Automatic Periodic Backups
 
