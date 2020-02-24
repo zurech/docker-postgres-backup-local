@@ -102,7 +102,7 @@ By default this container makes daily backups, but you can start a manual backup
 * Email Sending Enabled
 
     ```sh
-    $ docker run -e POSTGRES_HOST=postgres -e POSTGRES_DB=dbname -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e MAIL_BACKUP=TRUE -e SMTP_SERVER=smtp.example.com -e SMTP_PORT=587 -e MAIL_USER=user@example.com -e MAIL_PASSWORD=xxxxxxxx -e MAIL_FROM=test@example.com -e MAIL_FROM=test@example.com -e MAIL_TO=receiver@otherdomain.com -e MAIL_SUBJECT="Postgres DB Backup" zurech/docker-postgres-backup-local /backup.sh
+    $ docker run -e POSTGRES_HOST=postgres -e POSTGRES_DB=dbname -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e MAIL_BACKUP=TRUE -e SMTP_SERVER=smtp.example.com -e SMTP_PORT=587 -e MAIL_USER=user@example.com -e MAIL_PASSWORD=xxxxxxxx -e MAIL_FROM=test@example.com -e MAIL_TO=receiver@otherdomain.com -e MAIL_SUBJECT="Postgres DB Backup" zurech/docker-postgres-backup-local /backup.sh
     ```
 
 * Email Sending Disabled
