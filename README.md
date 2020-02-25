@@ -54,7 +54,7 @@ services:
             - MAIL_PASSWORD=xxxxxxxx
             - MAIL_FROM=test@example.com
             - MAIL_TO=receiver@otherdomain.com
-            - MAIL_SUBJECT="Postgres DB Backup"  
+            - MAIL_SUBJECT="Postgres DB Backup"
 
 ```
 

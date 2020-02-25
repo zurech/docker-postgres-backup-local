@@ -73,17 +73,11 @@ for DB in ${POSTGRES_DBS}; do
   ln -vf "${DFILE}" "${WFILE}"
   ln -vf "${DFILE}" "${MFILE}"
   if [ "${MAIL_BACKUP}" = "TRUE" ]; then
-    if ["${MAIL_FROM}" == "**None**" ] \
-       || ["${MAIL_TO}" == "**None**" ] \
-       || ["${MAIL_SUBJECT}" == "**None**" ] \
-       || ["${SMTP_SERVER}" == "**None**" ] \
-       || ["${SMTP_PORT}" == "**None**" ] \
-       || ["${MAIL_USER}" == "**None**" ] \
-       || ["${MAIL_PASSWORD}" == "**None**" ]; then
-      echo "Mail Environmental variables are not properly setup."
+    if [ "${MAIL_FROM}" = "**None**" -o "${MAIL_TO}" = "**None**" -o "${MAIL_SUBJECT}" = "**None**" -o "${SMTP_SERVER}" = "**None**" -o "${SMTP_PORT}" = "**None**" -o "${MAIL_USER}" = "**None**" -o "${MAIL_PASSWORD}" = "**None**" ]; then
+      echo "Mail backup enabled but environmental variables are not properly setup. Not sending backup through email"
     else
       MAIL_BODY="Postgres Backup Successfully Performed"
-      sendemail -f "${MAIL_FROM}" -t "${MAIL_TO}" -m "${MAIL_BODY}" -u "${MAIL_SUBJECT}" -s "${SMTP_SERVER}:${SMTP_PORT}" -xu "${MAIL_USER}" -xp "${MAIL_PASSWORD}" -a "${DFILE}"
+      sendemail -f "${MAIL_FROM}" -t "${MAIL_TO}" -m "${MAIL_BODY}" -u "${MAIL_SUBJECT}" -s "${SMTP_SERVER}:${SMTP_PORT}" -xu "${MAIL_USER}" -xp "${MAIL_PASSWORD}" -a "${DFILE}" -o tls=no
     fi
   else
     echo "Mail Backup not enabled...Moving on"
