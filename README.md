@@ -11,7 +11,7 @@ Supports the following Docker architectures: `linux/amd64`.
 
 Docker:
 ```sh
-$ docker run -e POSTGRES_HOST=postgres -e POSTGRES_DB=dbname -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e MAIL_BACKUP=TRUE -e SMTP_SERVER=smtp.example.com -e SMTP_PORT=587 -e MAIL_USER=user@example.com -e MAIL_PASSWORD=xxxxxxxx -e MAIL_FROM=test@example.com -e MAIL_FROM=test@example.com -e MAIL_TO=receiver@otherdomain.com -e MAIL_SUBJECT="Postgres DB Backup" zurech/docker-postgres-backup-local
+$ docker run -e POSTGRES_HOST=postgres -e POSTGRES_DB=dbname -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e MAIL_BACKUP=TRUE -e SMTP_SERVER=smtp.example.com -e SMTP_PORT=587 -e MAIL_USER=user@example.com -e MAIL_PASSWORD=xxxxxxxx -e MAIL_FROM=test@example.com -e MAIL_TO=receiver@otherdomain.com -e MAIL_SUBJECT="Postgres DB Backup" zurech/docker-postgres-backup-local
 ```
 
 Docker Compose:
