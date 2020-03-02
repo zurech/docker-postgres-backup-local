@@ -5,7 +5,7 @@ ARG GOCRONVER=v0.0.8
 ARG TARGETOS=linux
 ARG TARGETARCH=amd64
 RUN set -x \
-	&& apt-get update \
+  && apt-get update \
   && apt-get install -y --no-install-recommends \
     ca-certificates \ 
     curl \
@@ -13,9 +13,9 @@ RUN set -x \
     libnet-ssleay-perl \
     libio-socket-ssl-perl \
   && rm -rf /var/lib/apt/lists/* \
-	&& curl -L https://github.com/prodrigestivill/go-cron/releases/download/$GOCRONVER/go-cron-$TARGETOS-$TARGETARCH.gz | zcat > /usr/local/bin/go-cron \
-	&& chmod a+x /usr/local/bin/go-cron \
-	&& apt-get purge -y --auto-remove ca-certificates \
+  && curl -L https://github.com/prodrigestivill/go-cron/releases/download/$GOCRONVER/go-cron-$TARGETOS-$TARGETARCH.gz | zcat > /usr/local/bin/go-cron \
+  && chmod a+x /usr/local/bin/go-cron \
+  && apt-get purge -y --auto-remove ca-certificates \
   && apt-get clean
 
 ENV POSTGRES_DB="**None**" \
